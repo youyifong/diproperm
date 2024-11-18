@@ -78,7 +78,7 @@ DiProPerm <- function(X,y,B=1000,classifier="dwd",univ.stat="md",balance=TRUE,al
 
   X.t <- Matrix::t(X)
 
-  if(is.na(match("matrix.csr",class(X)))){X.t <- SparseM::as.matrix.csr(X.t)}
+  # if(is.na(match("matrix.csr",class(X)))){X.t <- SparseM::as.matrix.csr(X.t)}
 
 ########### Step 1: Calculate hyperplane using classifier direction #####################
   ######## DWD direction ##############
@@ -103,7 +103,8 @@ DiProPerm <- function(X,y,B=1000,classifier="dwd",univ.stat="md",balance=TRUE,al
 
   ######### Mean Difference Direction ########
   if (classifier=="md") {
-    X.temp <- SparseM::as.matrix(X)
+    # X.temp <- SparseM::as.matrix(X)
+    X.temp <- X
     w.md <- apply(X.temp[y==-1,],2,mean)-apply(X.temp[y==1,],2,mean)
     w.obs <- w.md / norm_vec(w.md)
   }
