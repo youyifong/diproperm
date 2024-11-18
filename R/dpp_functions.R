@@ -5,7 +5,6 @@
 #devtools::install_github("elbamos/clusteringdatasets")
 #devtools::install_github("grayclhn/dbframe-R-library")
 usethis::use_package("Matrix")
-usethis::use_package("SparseM")
 usethis::use_package("DWDLargeR")
 usethis::use_package("e1071")
 usethis::use_package("parallel")

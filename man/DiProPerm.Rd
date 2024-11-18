@@ -53,23 +53,6 @@ DiProPerm is a two-sample hypothesis test for comparing two high-dimensional
 distributions. The DiProPerm test is exact, i.e., the type I error is guaranteed
 to be controlled at the nominal level for any sample size. For more details see Wei et al. (2016).
 }
-\examples{
-\donttest{data(mushrooms)
-X <- Matrix::t(mushrooms$X)
-y <- mushrooms$y
-dpp <- DiProPerm(X=X,y=y,B=10)}
-\dontshow{data(mushrooms)
-X.temp <- SparseM::as.matrix(mushrooms$X)[,1:50]
-X <- Matrix::t(X.temp)
-y <- mushrooms$y[1:50]
-dpp <- DiProPerm(X=X,y=y,B=100,classifier="md")}
-\dontshow{data(mushrooms)
-X <- Matrix::t(mushrooms$X)
-X <- X[1:50,]
-y <- mushrooms$y[1:50]
-dpp <- DiProPerm(X=X,y=y,B=100,classifier="svm")}
-
-}
 \references{
 {Lam, X. Y., Marron, J. S., Sun, D., & Toh, K.-C. (2018). Fast Algorithms for
  Large-Scale Generalized Distance Weighted Discrimination. Journal of

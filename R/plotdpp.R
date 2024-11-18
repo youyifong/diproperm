@@ -20,24 +20,6 @@
 #' @export
 #'
 #' @author Andrew G. Allmon, J.S. Marron, Michael G. Hudgens
-#' @examples
-#' \donttest{data(mushrooms)
-#' X <- Matrix::t(mushrooms$X)
-#' y <- mushrooms$y
-#' dpp <- DiProPerm(X=X,y=y,B=10)
-#' plotdpp(dpp)}
-#' \dontshow{data(mushrooms)
-#' X.temp <- SparseM::as.matrix(mushrooms$X)[,1:50]
-#' X <- Matrix::t(X.temp)
-#' y <- mushrooms$y[1:50]
-#' dpp <- DiProPerm(X=X,y=y,B=100,classifier="md")
-#' plotdpp(dpp)}
-#' \dontshow{data(mushrooms)
-#' X <- Matrix::t(mushrooms$X)
-#' X <- X[1:50,]
-#' y <- mushrooms$y[1:50]
-#' dpp <- DiProPerm(X=X,y=y,B=100,classifier="svm")
-#' plotdpp(dpp)}
 
 plotdpp <- function(dpp,plots="all",w=0.001,h=0.001) {
 

@@ -36,21 +36,6 @@
 #' @importFrom usethis use_package
 #'
 #' @author Andrew G. Allmon, J.S. Marron, Michael G. Hudgens
-#' @examples
-#' \donttest{data(mushrooms)
-#' X <- Matrix::t(mushrooms$X)
-#' y <- mushrooms$y
-#' dpp <- DiProPerm(X=X,y=y,B=10)}
-#' \dontshow{data(mushrooms)
-#' X.temp <- SparseM::as.matrix(mushrooms$X)[,1:50]
-#' X <- Matrix::t(X.temp)
-#' y <- mushrooms$y[1:50]
-#' dpp <- DiProPerm(X=X,y=y,B=100,classifier="md")}
-#' \dontshow{data(mushrooms)
-#' X <- Matrix::t(mushrooms$X)
-#' X <- X[1:50,]
-#' y <- mushrooms$y[1:50]
-#' dpp <- DiProPerm(X=X,y=y,B=100,classifier="svm")}
 #'
 #' @references
 #' {Lam, X. Y., Marron, J. S., Sun, D., & Toh, K.-C. (2018). Fast Algorithms for
@@ -76,7 +61,7 @@ DiProPerm <- function(X,y,B=1000,classifier="dwd",univ.stat="md",balance=TRUE,al
   if(sum(is.element(c(1,-1),y)) != 2){stop("y vector must have class labels of '-1' and '1'.")}
   if(is.na(match("matrix",class(X))) & is.na(match("matrix.csr",class(X))) ) {stop("Error: Please make sure your input data, X, is a data matrix.")}
 
-  X.t <- Matrix::t(X)
+  X.t <- Matrix::t(Matrix::Matrix(X))
 
   # if(is.na(match("matrix.csr",class(X)))){X.t <- SparseM::as.matrix.csr(X.t)}
 
