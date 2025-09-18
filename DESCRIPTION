@@ -1,7 +1,7 @@
 Package: diproperm
 Type: Package
 Title: Conduct Direction-Projection-Permutation Tests and Display Plots
-Version: 0.2.0yf
+Version: 0.3.0
 Authors@R: c(person("Andrew G.", "Allmon", role = c("aut", "cre"), email = "allmondrew@yahoo.com"),
             person("J.S.", "Marron", role = "aut"),
             person("Michael G.","Hudgens", role = "aut"))
