@@ -30,76 +30,45 @@ usethis::use_package("sampling")
 #     return(simplify2array(answer, higher = (simplify == "array")))
 #   else return(answer)
 # }
- 
-# ChatGPT improved version of RepParallel to ensure reproducible parallel RNG streams
-RepParallel <- function(B, n.cores=2, expr, simplify="array", seed=NULL, ...) {
-  # store the current rng state 
-  save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
-  if (inherits(save.seed, "try-error")) {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) } 
-  # reproducible setup
-  set.seed(123, kind = "L'Ecuyer-CMRG")  
+
+# improved version of RepParallel to ensure reproducible parallel RNG streams
+RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
   
-  if(Sys.info()["sysname"] == 'Windows') {
+  # store the current rng state 
+  if (!exists(".Random.seed")) {
+    # rng has not been called
+    set.seed(123)
+  }
+  save.seed <- .Random.seed
+  
+  set.seed(123, kind = "L'Ecuyer-CMRG")  # reproducible setup
+  
+  
+  if (Sys.info()["sysname"] == "Windows") {
     n.cores <- 1
     message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
   }
   
-  if (!is.null(seed)) set.seed(seed)
   
-  # pre-generate seeds, one per replicate
-  seeds <- sample.int(.Machine$integer.max, B)
-  
+  # Ensure reproducible parallel RNG streams
+  # (set.seed() must be called *before* calling this function)
   answer <- parallel::mclapply(
-    seq_len(B),
-    function(i, ...) {
-      set.seed(seeds[i])
-      eval.parent(substitute(expr))
-    },
-    mc.cores = n.cores,
+    integer(B),
+    eval.parent(substitute(function(...) expr)),
+    mc.cores   = n.cores,
+    mc.set.seed = TRUE,   # <--- important for reproducibility
     ...
   )
   
   # restore rng state 
   assign(".Random.seed", save.seed, .GlobalEnv)    
   
-  if (!identical(simplify, FALSE) && length(answer))
+  if (!identical(simplify, FALSE) && length(answer)) {
     return(simplify2array(answer, higher = (simplify == "array")))
-  else return(answer)
+  } else {
+    return(answer)
+  }
 }
-
-# RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
-# 
-#   # store the current rng state 
-#   save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
-#   if (inherits(save.seed, "try-error")) {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) } 
-#   # reproducible setup
-#   set.seed(123, kind = "L'Ecuyer-CMRG")  
-# 
-#     
-#   if (Sys.info()["sysname"] == "Windows") {
-#     n.cores <- 1
-#     message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
-#   }
-#   
-#   # Ensure reproducible parallel RNG streams
-#   # (set.seed() must be called *before* calling this function)
-#   answer <- parallel::mclapply(
-#     integer(B),
-#     eval.parent(substitute(function(...) expr)),
-#     mc.cores   = n.cores,
-#     mc.set.seed = TRUE,   # <--- important for reproducibility
-#     ...
-#   )
-#   
-#   # restore rng state 
-#   assign(".Random.seed", save.seed, .GlobalEnv)    
-#   
-#   if (!identical(simplify, FALSE) && length(answer)) {
-#     return(simplify2array(answer, higher = (simplify == "array")))
-#   } else {
-#     return(answer)
-#   }
-# }
 
 
 ## Calculates the norm of a vector as done in python DPP package
@@ -114,40 +83,40 @@ quiet <- function(b) {
 
 ## Conduct a balanced permutation ##
 dwd_rsamp <- function(balance,n) {
-
+  
   if(balance==TRUE) {
     ## Initalize Vecotr to hold the class labels
     simy <- vector(length = n)
-
+    
     ## Reassign strata values to match what can be read into balancedstratification function
     strata <- y
     strata[strata==-1] <- 2
-
+    
     n1 <- table(strata)[[1]]  ## Number in class 1
     n2 <- table(strata)[[2]]  ## Number in class -1
-
+    
     # matrix of balancing variables
     index=cbind(seq(1:length(strata)))
-
+    
     # Vector of inclusion probabilities.
     pik=rep(n1/n,times=n)
-
+    
     ## Permform balanced permutation
     s=sampling::balancedstratification(index,strata,pik,comment = FALSE)
-
+    
     # the sample is
     c1 <- (1:length(pik))[s==1]
     c2 <- (1:length(pik))[s==0]
-
+    
     ## Reassign previous class labels to work with DWD
     simy[c1] <- 1
     simy[c2] <- -1
-
+    
     return(simy)
   }
-
+  
   if(balance==FALSE) {
-
+    
     ## Performs random permutation
     return(sample(y,prob = rep(0.5,n)))
   }
@@ -159,17 +128,17 @@ dwd_rsamp <- function(balance,n) {
 dwd_scores <- function(X.t,n,balance) {
   set.seed(NULL)
   perm_y <- dwd_rsamp(balance,n)
-
+  
   ## Calculate the penalty parameter to be used for DiProPerm ##
   C = quiet(DWDLargeR::penaltyParameter(X.t,perm_y,expon=1,rmzeroFea = 0))
-
+  
   # solve the generalized DWD model
   result = quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
-
+  
   ## Calculate Permuted Scores ##
   w <- result$w / norm_vec(result$w) ## Loadings of Separating Hyperplane
   xw <- X %*% w  ## Projected scores onto hyperplane
-
+  
   return(list(data.frame(xw,perm_y)))
 }
 
@@ -178,28 +147,30 @@ svm_scores <- function(Xtemp,n,balance) {
   set.seed(NULL)
   perm_y <- dwd_rsamp(balance,n)
   perm_y_temp <- as.factor(perm_y)
-
+  
   # solve the SVM model
   result = e1071::svm(Xtemp,perm_y_temp, kernel="linear")
-
+  
   w.svm <- Matrix::as.matrix(drop(t(result$coefs)%*%Xtemp[result$index,]))
-
+  
   ## Calculate Permuted Scores ##
   w <- w.svm[1,] / norm_vec(w.svm[1,]) ## Loadings of Separating Hyperplane
   xw <- X %*% w  ## Projected scores onto hyperplane
-
+  
   return(list(data.frame(xw,perm_y)))
 }
+
+
 
 ## Calculates the mean difference direction
 md_scores <- function(X.temp,n,balance) {
   set.seed(NULL)
   perm_y <- dwd_rsamp(balance,n)
-
+  
   w.md <- abs(apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
   w <- w.md / norm_vec(w.md)
   xw <- X.temp %*% w
-
+  
   return(list(data.frame(xw,perm_y)))
 }
 
@@ -208,3 +179,7 @@ sumfun_diffmean <- function(dat) {
   with(dat,abs(mean(xw[perm_y==1])-mean(xw[perm_y==-1])))
   #with(dat,abs(mean(xw[y==1])-mean(xw[y==-1])))
 }
+
+
+
+
