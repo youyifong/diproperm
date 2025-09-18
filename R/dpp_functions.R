@@ -33,6 +33,12 @@ usethis::use_package("sampling")
  
 # ChatGPT improved version of RepParallel to ensure reproducible parallel RNG streams
 RepParallel <- function(B, n.cores=2, expr, simplify="array", seed=NULL, ...) {
+  # store the current rng state 
+  save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
+  if (inherits(save.seed, "try-error")) {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) } 
+  # reproducible setup
+  set.seed(123, kind = "L'Ecuyer-CMRG")  
+  
   if(Sys.info()["sysname"] == 'Windows') {
     n.cores <- 1
     message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
@@ -53,44 +59,47 @@ RepParallel <- function(B, n.cores=2, expr, simplify="array", seed=NULL, ...) {
     ...
   )
   
+  # restore rng state 
+  assign(".Random.seed", save.seed, .GlobalEnv)    
+  
   if (!identical(simplify, FALSE) && length(answer))
     return(simplify2array(answer, higher = (simplify == "array")))
   else return(answer)
 }
 
-RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
-
-  # store the current rng state 
-  save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
-  if (inherits(save.seed, "try-error")) {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) } 
-
-  set.seed(123, kind = "L'Ecuyer-CMRG")  # reproducible setup
-
-    
-  if (Sys.info()["sysname"] == "Windows") {
-    n.cores <- 1
-    message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
-  }
-  
-  # Ensure reproducible parallel RNG streams
-  # (set.seed() must be called *before* calling this function)
-  answer <- parallel::mclapply(
-    integer(B),
-    eval.parent(substitute(function(...) expr)),
-    mc.cores   = n.cores,
-    mc.set.seed = TRUE,   # <--- important for reproducibility
-    ...
-  )
-  
-  # restore rng state 
-  assign(".Random.seed", save.seed, .GlobalEnv)    
-  
-  if (!identical(simplify, FALSE) && length(answer)) {
-    return(simplify2array(answer, higher = (simplify == "array")))
-  } else {
-    return(answer)
-  }
-}
+# RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
+# 
+#   # store the current rng state 
+#   save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
+#   if (inherits(save.seed, "try-error")) {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) } 
+#   # reproducible setup
+#   set.seed(123, kind = "L'Ecuyer-CMRG")  
+# 
+#     
+#   if (Sys.info()["sysname"] == "Windows") {
+#     n.cores <- 1
+#     message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
+#   }
+#   
+#   # Ensure reproducible parallel RNG streams
+#   # (set.seed() must be called *before* calling this function)
+#   answer <- parallel::mclapply(
+#     integer(B),
+#     eval.parent(substitute(function(...) expr)),
+#     mc.cores   = n.cores,
+#     mc.set.seed = TRUE,   # <--- important for reproducibility
+#     ...
+#   )
+#   
+#   # restore rng state 
+#   assign(".Random.seed", save.seed, .GlobalEnv)    
+#   
+#   if (!identical(simplify, FALSE) && length(answer)) {
+#     return(simplify2array(answer, higher = (simplify == "array")))
+#   } else {
+#     return(answer)
+#   }
+# }
 
 
 ## Calculates the norm of a vector as done in python DPP package
