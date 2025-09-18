@@ -126,7 +126,7 @@ dwd_rsamp <- function(balance,n) {
 
 ## Calculates the DWD scores ##
 dwd_scores <- function(X.t,n,balance) {
-  set.seed(NULL)
+  
   perm_y <- dwd_rsamp(balance,n)
   
   ## Calculate the penalty parameter to be used for DiProPerm ##
@@ -144,7 +144,7 @@ dwd_scores <- function(X.t,n,balance) {
 
 ## Calculates the SVM scores ##
 svm_scores <- function(Xtemp,n,balance) {
-  set.seed(NULL)
+  
   perm_y <- dwd_rsamp(balance,n)
   perm_y_temp <- as.factor(perm_y)
   
@@ -164,7 +164,7 @@ svm_scores <- function(Xtemp,n,balance) {
 
 ## Calculates the mean difference direction
 md_scores <- function(X.temp,n,balance) {
-  set.seed(NULL)
+  
   perm_y <- dwd_rsamp(balance,n)
   
   w.md <- abs(apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
