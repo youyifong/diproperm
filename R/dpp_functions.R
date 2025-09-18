@@ -32,6 +32,32 @@ usethis::use_package("sampling")
 # }
  
 # ChatGPT improved version of RepParallel to ensure reproducible parallel RNG streams
+RepParallel <- function(B, n.cores=2, expr, simplify="array", seed=NULL, ...) {
+  if(Sys.info()["sysname"] == 'Windows') {
+    n.cores <- 1
+    message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
+  }
+  
+  if (!is.null(seed)) set.seed(seed)
+  
+  # pre-generate seeds, one per replicate
+  seeds <- sample.int(.Machine$integer.max, B)
+  
+  answer <- parallel::mclapply(
+    seq_len(B),
+    function(i, ...) {
+      set.seed(seeds[i])
+      eval.parent(substitute(expr))
+    },
+    mc.cores = n.cores,
+    ...
+  )
+  
+  if (!identical(simplify, FALSE) && length(answer))
+    return(simplify2array(answer, higher = (simplify == "array")))
+  else return(answer)
+}
+
 RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
 
   # store the current rng state 
