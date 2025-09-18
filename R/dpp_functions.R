@@ -17,19 +17,45 @@ usethis::use_package("dplyr")
 #usethis::use_package("methods")
 usethis::use_package("sampling")
 
-## Parallel version of replicate taken from dbframe on github ##
-RepParallel <- function(B, n.cores=2 , expr, simplify = "array",...) {
-
-  if(Sys.info()["sysname"] == 'Windows') {
-      n.cores=1
-      message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
-    }
-
-  answer <- parallel::mclapply(integer(B), eval.parent(substitute(function(...) expr)),mc.cores = n.cores,...)
-  if (!identical(simplify, FALSE) && length(answer))
+# ## Parallel version of replicate taken from dbframe on github ##
+# RepParallel <- function(B, n.cores=2 , expr, simplify = "array",...) {
+# 
+#   if(Sys.info()["sysname"] == 'Windows') {
+#       n.cores=1
+#       message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
+#     }
+# 
+#   answer <- parallel::mclapply(integer(B), eval.parent(substitute(function(...) expr)),mc.cores = n.cores,...)
+#   if (!identical(simplify, FALSE) && length(answer))
+#     return(simplify2array(answer, higher = (simplify == "array")))
+#   else return(answer)
+# }
+ 
+# ChatGPT improved version of RepParallel to ensure reproducible parallel RNG streams
+RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
+  
+  if (Sys.info()["sysname"] == "Windows") {
+    n.cores <- 1
+    message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
+  }
+  
+  # Ensure reproducible parallel RNG streams
+  # (set.seed() must be called *before* calling this function)
+  answer <- parallel::mclapply(
+    integer(B),
+    eval.parent(substitute(function(...) expr)),
+    mc.cores   = n.cores,
+    mc.set.seed = TRUE,   # <--- important for reproducibility
+    ...
+  )
+  
+  if (!identical(simplify, FALSE) && length(answer)) {
     return(simplify2array(answer, higher = (simplify == "array")))
-  else return(answer)
+  } else {
+    return(answer)
+  }
 }
+
 
 ## Calculates the norm of a vector as done in python DPP package
 norm_vec <- function(a) sqrt(sum(a^2))
