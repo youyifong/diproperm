@@ -33,7 +33,14 @@ usethis::use_package("sampling")
  
 # ChatGPT improved version of RepParallel to ensure reproducible parallel RNG streams
 RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
-  
+
+  # store the current rng state 
+  save.seed <- try(get(".Random.seed", .GlobalEnv), silent=TRUE) 
+  if (inherits(save.seed, "try-error")) {set.seed(1); save.seed <- get(".Random.seed", .GlobalEnv) } 
+
+  set.seed(123, kind = "L'Ecuyer-CMRG")  # reproducible setup
+
+    
   if (Sys.info()["sysname"] == "Windows") {
     n.cores <- 1
     message("Note: Parallel processing is not available for Windows machines at this time. Thus, only 1 core will be used.")
@@ -48,6 +55,9 @@ RepParallel <- function(B, n.cores = 2, expr, simplify = "array", ...) {
     mc.set.seed = TRUE,   # <--- important for reproducibility
     ...
   )
+  
+  # restore rng state 
+  assign(".Random.seed", save.seed, .GlobalEnv)    
   
   if (!identical(simplify, FALSE) && length(answer)) {
     return(simplify2array(answer, higher = (simplify == "array")))
