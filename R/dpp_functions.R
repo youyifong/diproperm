@@ -167,7 +167,7 @@ md_scores <- function(X.temp,n,balance) {
   
   perm_y <- dwd_rsamp(balance,n)
   
-  w.md <- abs(apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
+  w.md <- (apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
   w <- w.md / norm_vec(w.md)
   xw <- X.temp %*% w
   
