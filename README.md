@@ -16,3 +16,11 @@ Note: Some users have experienced an issue where the R package 'gert' needs to b
 Note: Some users have also reported no computational gain after using 10 cores.
 
 v 0.2.0 adds the functionality of SVM to the package as well as improved documentation and improved error handling 
+
+
+
+## Youyi
+
+0.3.1 introduces two bug fixes:
+1. Fixed a bug in the permutation statistics calculation 
+2. Fixed a bug in the SVM implementation

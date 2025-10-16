@@ -83,7 +83,7 @@ DiProPerm <- function(X,y,B=1000,classifier="dwd",univ.stat="md",balance=TRUE,al
     y.temp <- as.factor(y)
     result <- e1071::svm(X,y.temp, kernel = "linear")
     w.svm <- Matrix::as.matrix(drop(t(result$coefs)%*%X[result$index,]))
-    w.obs <- w.svm[1,] / norm_vec(w.svm[1,])
+    w.obs <- w.svm / norm_vec(w.svm[1,])
   }
 
   ######### Mean Difference Direction ########
@@ -95,6 +95,8 @@ DiProPerm <- function(X,y,B=1000,classifier="dwd",univ.stat="md",balance=TRUE,al
   }
 
 ########### Step 2: Caluculate two sample univariate meand difference statistic #####################
+  str(X)
+  str(w.obs)
   xw.obs <- X %*% w.obs
   if (univ.stat=="md") {
     obs.teststat <- abs(mean(xw.obs[y==1])-mean(xw.obs[y==-1])) ## Very close to obs.test.md which is in DPP python package

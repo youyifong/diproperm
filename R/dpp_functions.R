@@ -154,7 +154,7 @@ svm_scores <- function(Xtemp,n,balance) {
   w.svm <- Matrix::as.matrix(drop(t(result$coefs)%*%Xtemp[result$index,]))
   
   ## Calculate Permuted Scores ##
-  w <- w.svm[1,] / norm_vec(w.svm[1,]) ## Loadings of Separating Hyperplane
+  w <- w.svm / norm_vec(w.svm[1,]) ## Loadings of Separating Hyperplane
   xw <- X %*% w  ## Projected scores onto hyperplane
   
   return(list(data.frame(xw,perm_y)))
