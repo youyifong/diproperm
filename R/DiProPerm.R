@@ -95,8 +95,8 @@ DiProPerm <- function(X,y,B=1000,classifier="dwd",univ.stat="md",balance=TRUE,al
   }
 
 ########### Step 2: Caluculate two sample univariate meand difference statistic #####################
-  str(X)
-  str(w.obs)
+  # str(X)
+  # str(w.obs)
   xw.obs <- X %*% w.obs
   if (univ.stat=="md") {
     obs.teststat <- abs(mean(xw.obs[y==1])-mean(xw.obs[y==-1])) ## Very close to obs.test.md which is in DPP python package
