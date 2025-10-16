@@ -112,13 +112,14 @@ dwd_rsamp <- function(balance,n) {
     simy[c1] <- 1
     simy[c2] <- -1
     
+    # sometimes 0's are returned
     return(simy)
   }
   
   if(balance==FALSE) {
     
     ## Performs random permutation
-    return(sample(y,prob = rep(0.5,n)))
+    return(sample(y,replace = TRUE))
   }
   #perm <- randperm(y)
   #return(perm)
@@ -150,12 +151,12 @@ svm_scores <- function(Xtemp,n,balance) {
   
   # solve the SVM model
   result = e1071::svm(Xtemp,perm_y_temp, kernel="linear")
-  
+  print(summary(result))
+  print(perm_y_temp)
   w.svm <- Matrix::as.matrix(drop(t(result$coefs)%*%Xtemp[result$index,]))
-  
   ## Calculate Permuted Scores ##
   w <- w.svm / norm_vec(w.svm[1,]) ## Loadings of Separating Hyperplane
-  xw <- X %*% w  ## Projected scores onto hyperplane
+  xw <- Xtemp %*% w  ## Projected scores onto hyperplane
   
   return(list(data.frame(xw,perm_y)))
 }
@@ -166,7 +167,7 @@ svm_scores <- function(Xtemp,n,balance) {
 md_scores <- function(X.temp,n,balance) {
   
   perm_y <- dwd_rsamp(balance,n)
-  
+
   w.md <- (apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
   w <- w.md / norm_vec(w.md)
   xw <- X.temp %*% w
