@@ -119,7 +119,7 @@ dwd_rsamp <- function(balance,n) {
   if(balance==FALSE) {
     
     ## Performs random permutation
-    return(sample(y,replace = TRUE))
+    return(sample(y,replace = FALSE))
   }
   #perm <- randperm(y)
   #return(perm)
@@ -163,8 +163,9 @@ svm_scores <- function(Xtemp,n,balance) {
 
 ## Calculates the mean difference direction
 md_scores <- function(X.temp,n,balance) {
-  
+  print(balance)
   perm_y <- dwd_rsamp(balance,n)
+  print(table(perm_y))
 
   w.md <- (apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
   w <- w.md / norm_vec(w.md)

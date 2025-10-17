@@ -20,6 +20,7 @@ Some simulation study results:
 
 ```{bash}
 ml fhR/4.4.0-foss-2023b
+
 for (( i =1; i<=1000; i++)); do
     sbatch  --wrap="Rscript simstudy.R $i" --output=logs/sim_$i.out 
 done
