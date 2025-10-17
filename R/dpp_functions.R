@@ -149,8 +149,8 @@ svm_scores <- function(Xtemp,n,balance) {
   
   # solve the SVM model
   result = e1071::svm(Xtemp,perm_y_temp, kernel="linear")
-  print(summary(result))
-  print(perm_y_temp)
+  # print(summary(result))
+  # print(perm_y_temp)
   w.svm <- Matrix::as.matrix(drop(t(result$coefs)%*%Xtemp[result$index,]))
   ## Calculate Permuted Scores ##
   w <- w.svm / norm_vec(w.svm[1,]) ## Loadings of Separating Hyperplane
@@ -163,9 +163,9 @@ svm_scores <- function(Xtemp,n,balance) {
 
 ## Calculates the mean difference direction
 md_scores <- function(X.temp,n,balance) {
-  print(balance)
+  # print(balance)
   perm_y <- dwd_rsamp(balance,n)
-  print(table(perm_y))
+  # print(table(perm_y))
 
   w.md <- (apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
   w <- w.md / norm_vec(w.md)
