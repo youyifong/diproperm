@@ -130,17 +130,15 @@ dwd_scores <- function(X.t,n,balance) {
   
   perm_y <- dwd_rsamp(balance,n)
   
-  ## Calculate the penalty parameter to be used for DiProPerm ##
-  C = quiet(DWDLargeR::penaltyParameter(X.t,perm_y,expon=1,rmzeroFea = 0))
+    ## Calculate the penalty parameter to be used for DiProPerm ##
   
-  # solve the generalized DWD model
-  result = quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
-  
-  ## Calculate Permuted Scores ##
-  w <- result$w / norm_vec(result$w) ## Loadings of Separating Hyperplane
-  xw <- X %*% w  ## Projected scores onto hyperplane
-  
-  return(list(data.frame(xw,perm_y)))
+    C = quiet(DWDLargeR::penaltyParameter(X.t,perm_y,expon=1,rmzeroFea = 0))
+    # solve the generalized DWD model
+    result = quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
+    w <- result$w / norm_vec(result$w) 
+    xw <- Matrix::t(X) %*% w  ## Projected scores onto hyperplane
+    
+    return(list(data.frame(xw,perm_y)))
 }
 
 ## Calculates the SVM scores ##
