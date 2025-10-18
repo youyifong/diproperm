@@ -1,3 +1,6 @@
+logs/
+output*/
+
 # History files
 .Rhistory
 .Rapp.history
