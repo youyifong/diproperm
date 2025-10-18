@@ -130,15 +130,15 @@ dwd_scores <- function(X.t,n,balance) {
   
   perm_y <- dwd_rsamp(balance,n)
   
-    ## Calculate the penalty parameter to be used for DiProPerm ##
+  ## Calculate the penalty parameter to be used for DiProPerm ##
+
+  C = quiet(DWDLargeR::penaltyParameter(X.t,perm_y,expon=1,rmzeroFea = 0))
+  # solve the generalized DWD model
+  result = quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
+  w <- result$w / norm_vec(result$w) 
+  xw <- t(as.matrix(X.t)) %*% w  ## Projected scores onto hyperplane
   
-    C = quiet(DWDLargeR::penaltyParameter(X.t,perm_y,expon=1,rmzeroFea = 0))
-    # solve the generalized DWD model
-    result = quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
-    w <- result$w / norm_vec(result$w) 
-    xw <- Matrix::t(X) %*% w  ## Projected scores onto hyperplane
-    
-    return(list(data.frame(xw,perm_y)))
+  return(list(data.frame(xw,perm_y)))
 }
 
 ## Calculates the SVM scores ##
@@ -149,8 +149,8 @@ svm_scores <- function(Xtemp,n,balance) {
   
   # solve the SVM model
   result = e1071::svm(Xtemp,perm_y_temp, kernel="linear")
-  print(summary(result))
-  print(perm_y_temp)
+  # print(summary(result))
+  # print(perm_y_temp)
   w.svm <- Matrix::as.matrix(drop(t(result$coefs)%*%Xtemp[result$index,]))
   ## Calculate Permuted Scores ##
   w <- w.svm / norm_vec(w.svm[1,]) ## Loadings of Separating Hyperplane
@@ -163,9 +163,9 @@ svm_scores <- function(Xtemp,n,balance) {
 
 ## Calculates the mean difference direction
 md_scores <- function(X.temp,n,balance) {
-  print(balance)
+  # print(balance)
   perm_y <- dwd_rsamp(balance,n)
-  print(table(perm_y))
+  # print(table(perm_y))
 
   w.md <- (apply(X.temp[perm_y==-1,],2,mean)-apply(X.temp[perm_y==1,],2,mean))
   w <- w.md / norm_vec(w.md)
