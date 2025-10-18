@@ -15,7 +15,7 @@ This fork of jiadongm/diproperm provides several fixes to the package.
 
 
 Some simulation study results:
-- md  (1000 replicates). size: 0.052, power: 0.105
+- md  (1000 replicates). size: 0.052, power: 0.110
 - dwd (1000 replicates): size: -; power: -
 
 ```{bash}
