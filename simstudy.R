@@ -13,7 +13,7 @@ library(diproperm)
 n=20
 p=5
 mu <- mu1 <- rep(0,p) 
-mu1[1]=mu1[1]+0.5      # 0 for size, 0.5 for power
+mu1[1]=mu1[1]+0.5    # 0 for size, 0.5 for power
 Sigma <- diag(rep(1,p))
 y=c(rep(1,n/2), rep(-1,n/2))
 
@@ -22,8 +22,8 @@ X <- rbind(
   mvrnorm(n = n/2, mu = mu1, Sigma = Sigma)
 )
 
-# classifier="dwd"
-classifier="md"
+classifier="dwd"
+# classifier="md"
 
 out=DiProPerm (X=X, y=y, B=1000, classifier=classifier, univ.stat="md", cores=1)
 
