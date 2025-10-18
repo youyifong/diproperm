@@ -16,7 +16,7 @@ This fork of jiadongm/diproperm provides several fixes to the package.
 
 Some simulation study results:
 - md  (1000 replicates). size: 0.052, power: 0.110
-- dwd (1000 replicates): size: -; power: -
+- dwd (1000 replicates): size: 0.040; power: 0.097
 
 ```{bash}
 ml fhR/4.4.0-foss-2023b
