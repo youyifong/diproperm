@@ -130,11 +130,17 @@ dwd_scores <- function(X.t,n,balance) {
   
   perm_y <- dwd_rsamp(balance,n)
   
-  ## Calculate the penalty parameter to be used for DiProPerm ##
-
+  # the call to penaltyParameter below set.seed to 0 internally, so we need to save and restore the rng state
+  save.seed <- .Random.seed 
+  
+  # calculate the penalty parameter to be used for DiProPerm ##
   C = quiet(DWDLargeR::penaltyParameter(X.t,perm_y,expon=1,rmzeroFea = 0))
   # solve the generalized DWD model
-  result = quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
+  result =      quiet(DWDLargeR::genDWD(X.t,perm_y,C=C,expon=1,rmzeroFea = 0)) ## Iain uses C=0.1 in his example
+  
+  # restore rng state 
+  assign(".Random.seed", save.seed, .GlobalEnv)   
+  
   w <- result$w / norm_vec(result$w) 
   xw <- t(as.matrix(X.t)) %*% w  ## Projected scores onto hyperplane
   
